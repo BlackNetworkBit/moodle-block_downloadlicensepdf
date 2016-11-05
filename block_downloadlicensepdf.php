@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Newblock block caps.
+ * downloadlicensepdf block caps.
  *
- * @package    block_newblock
+ * @package    block_downloadlicensepdf
  * @copyright  Daniel Neis <danielneis@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class block_newblock extends block_base {
+class block_downloadlicensepdf extends block_base {
 
     function init() {
-        $this->title = get_string('pluginname', 'block_newblock');
+        $this->title = get_string('pluginname', 'block_downloadlicensepdf');
     }
 
     function get_content() {
