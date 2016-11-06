@@ -25,16 +25,30 @@
  //id (AI)(int 20l), file_id (int 20l), course_id (int 20l))
 function block_downloadlicensepdf_get_records($courseid) {
     global $DB; 
-    return $DB->get_records('mdl_block_downloadlicensepdf', array('course_id' => $courseid));
+    return $DB->get_records('block_downloadlicensepdf', array('course_id' => $courseid));
 }
-function block_downloadlicensepdf_add_records($dataobjects) {
+function block_downloadlicensepdf_delete_records($dataobjects,$courseid) {
+	global $DB; 
+	$querystring = 'DELETE from mdl_block_downloadlicensepdf where course_id=? and file_id in (' . implode(',', $dataobjects) . ')';
+	$DB->execute($querystring,array($courseid));
+}
+function block_downloadlicensepdf_add_records($dataobjects,$courseid) {
     global $DB;
+    $datae = block_downloadlicensepdf_get_records($courseid);
     $insertdata=array();
     foreach ($dataobjects as $data){
-        $newd = new stdClass();
-        $newd->file_id = $data['file_id'];
-        $newd->course_id = $data['course_id'];
-        $insertdata[]=$newd;
+    	  $skip=false;
+    	  foreach ($datae as $entry) {
+    	      if ($entry->file_id == $data) {
+    	          $skip=true;
+    	      }
+    	  }
+    	  if (!$skip) {
+            $newd = new stdClass();
+            $newd->file_id = $data;
+            $newd->course_id = $courseid;
+            $insertdata[]=$newd;
+    	  }
     }
-    return $DB->insert_records('mdl_block_downloadlicensepdf', $insertdata);
+    return $DB->insert_records('block_downloadlicensepdf', $insertdata);
 }

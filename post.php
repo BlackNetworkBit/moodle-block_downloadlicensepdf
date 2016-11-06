@@ -22,8 +22,6 @@ if (!has_capability('moodle/course:manageactivities', $context)) {
 }
 global $DB, $CFG;
 require_once($CFG->dirroot . '/blocks/downloadlicensepdf/locallib.php');
-echo var_dump(block_downloadlicensepdf_get_records($courseid));
-
 $fileids = $_POST["file_ids"]; // Get all checked Checkboxes.
 $allfileids = $_POST["all_ids"]; // Necessary to get all Checkbox elements to delete unwanted db entry's.
 if (is_array($allfileids)) {
@@ -38,6 +36,13 @@ if (is_array($allfileids)) {
     	      $uncheckeditems[]=$afi; // All items which are not checked are unchecked.
     	  }
     }
-    echo "Checked items : " . implode(",",$checkeditems) . "</br>Unchecked Items : " . implode(",",$uncheckeditems);
+    if (count($checkeditems)>0){
+        block_downloadlicensepdf_add_records($checkeditems,$courseid);
+    }
+    if (count($uncheckeditems)>0){
+       block_downloadlicensepdf_delete_records($uncheckeditems,$courseid);
+    }
 }
+$uri=new moodle_url('/course/view.php', array('id' => $courseid));
+redirect($uri);
 // Db entry's are => id, file_id, course_id

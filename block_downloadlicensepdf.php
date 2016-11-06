@@ -38,6 +38,8 @@ class block_downloadlicensepdf extends block_base {
         if (!has_capability('moodle/course:manageactivities', $context)) {
             return;
         }
+        require_once($CFG->dirroot . '/blocks/downloadlicensepdf/locallib.php');
+        $checkedfiles=block_downloadlicensepdf_get_records($COURSE->id);
         $this->content = new stdClass;
         $fs = get_file_storage();
         $mod = get_fast_modinfo($COURSE);
@@ -68,7 +70,14 @@ class block_downloadlicensepdf extends block_base {
         	               	 $filename=substr($rawfilename, 0, strrpos($rawfilename,'.'));
         	               	 $this->content->text .= html_writer::start_tag('div');
         	               	 $this->content->text .= html_writer::start_tag('input',array('type' => 'hidden', 'name' => 'all_ids[]', 'value' => $file->get_id()));
-        	               	 $this->content->text .= html_writer::start_tag('input', array('type' => 'checkbox', 'name' => 'file_ids[]' , 'value' => $file->get_id()));
+        	               	 $isselected=false;
+        	               	 foreach ($checkedfiles as $chk) {
+        	               	     if ($file->get_id() == $chk->file_id) {
+        	               	         $isselected=true;
+        	               	     }
+        	               	 }
+        	               	 $checkbox = '<input type="checkbox" name="file_ids[]" value="' . $file->get_id() . '" ' . ($isselected ? 'checked' : '') . '>';
+        	               	 $this->content->text .= $checkbox; // I note used empty_tag because they messed up with empty parameters ( checked not suported ).
         	                   $this->content->text .= $filename . ' (PDF)' .  html_writer::end_tag('div');
         	               }
         	           }
