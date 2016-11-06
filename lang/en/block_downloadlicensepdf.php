@@ -31,3 +31,7 @@ $string['labelfoo'] = 'Config label';
 $string['downloadlicensepdf:addinstance'] = 'Add a downloadlicensepdf block';
 $string['downloadlicensepdf:myaddinstance'] = 'Add a downloadlicensepdf block to my moodle';
 $string['pluginname'] = 'downloadlicensepdf';
+
+$string['save'] = 'Save';
+$string['form_title'] = 'Do the following PDF files have any License ?';
+$string['notrainer'] = 'You are not a Trainer !';

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,21 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_downloadlicensepdf', language 'en'
+ * API functions implementation for block_downloadlicensepdf.
  *
  * @package   block_downloadlicensepdf
- * @copyright Daniel Neis <danielneis@gmail.com>
+ * @copyright 2016 Vincent Schneider
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$string['blockstring'] = 'Block string';
-$string['descconfig'] = 'Description of the config section';
-$string['descfoo'] = 'Config description';
-$string['headerconfig'] = 'Config section header';
-$string['labelfoo'] = 'Config label';
-$string['downloadlicensepdf:addinstance'] = 'Add a downloadlicensepdf block';
-$string['pluginname'] = 'Download License PDF';
-
-$string['save'] = 'Speichern';
-$string['form_title'] = 'Haben folgende PDF-Dateien Lizenzen?';
-$string['notrainer'] = 'Du bist kein Trainer !';
+ 
+ //id (AI)(int 20l), file_id (int 20l), course_id (int 20l))
+function block_downloadlicensepdf_get_records($courseid) {
+    global $DB; 
+    return $DB->get_records('mdl_block_downloadlicensepdf', array('course_id' => $courseid));
+}
+function block_downloadlicensepdf_add_records($dataobjects) {
+    global $DB;
+    $insertdata=array();
+    foreach ($dataobjects as $data){
+        $newd = new stdClass();
+        $newd->file_id = $data['file_id'];
+        $newd->course_id = $data['course_id'];
+        $insertdata[]=$newd;
+    }
+    return $DB->insert_records('mdl_block_downloadlicensepdf', $insertdata);
+}

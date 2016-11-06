@@ -29,7 +29,6 @@ class block_downloadlicensepdf extends block_base {
     function init() {
         $this->title = get_string('pluginname', 'block_downloadlicensepdf');
     }
-
     function get_content() {
         global $CFG, $OUTPUT, $COURSE;
         if ($this->content !== null) {
@@ -43,7 +42,8 @@ class block_downloadlicensepdf extends block_base {
         $fs = get_file_storage();
         $mod = get_fast_modinfo($COURSE);
         $sections = $mod->get_sections();
-        $this->content->text = html_writer::start_tag('form',array('action' => '/path/file.php', 'method' => 'post'));
+        $this->content->text = html_writer::start_tag('form',array('action' => '/blocks/downloadlicensepdf/post.php', 'method' => 'post'));
+        $this->content->text .= html_writer::start_tag('strong') . get_string('form_title', 'block_downloadlicensepdf') . html_writer::end_tag('strong');
         foreach ($sections as $sectionn => $cmids) {
         	   foreach ($cmids as $cmid) {
         	       $cminfo = $mod->get_cm($cmid);
@@ -63,16 +63,20 @@ class block_downloadlicensepdf extends block_base {
         	               $dir .= '/' . clean_filename($cminfo->get_formatted_name());
         	           }
         	           foreach ($files as $pathha => $file) {
-        	               $filename = $file->get_filename();
-        	               if ($file->get_mimetype() == 'application/pdf' || substr(strrchr($filename, '.'),1) == 'pdf') {
-        	               	 $this->content->text .= html_writer::start_tag('input', array('type' => 'checkbox', 'name' => 'file_ids' , 'value' => $file->get_id()));
-        	                   $this->content->text .= $file->get_filename() . html_writer::end_tag('input');
+        	               $rawfilename = $file->get_filename();
+        	               if ($file->get_mimetype() == 'application/pdf' || substr(strrchr($rawfilename, '.'),1) == 'pdf') {
+        	               	 $filename=substr($rawfilename, 0, strrpos($rawfilename,'.'));
+        	               	 $this->content->text .= html_writer::start_tag('div');
+        	               	 $this->content->text .= html_writer::start_tag('input',array('type' => 'hidden', 'name' => 'all_ids[]', 'value' => $file->get_id()));
+        	               	 $this->content->text .= html_writer::start_tag('input', array('type' => 'checkbox', 'name' => 'file_ids[]' , 'value' => $file->get_id()));
+        	                   $this->content->text .= $filename . ' (PDF)' .  html_writer::end_tag('div');
         	               }
         	           }
         	       }
         	   }
         }
-        //$this->content->text .= $file->get_filename() . html_writer::empty_tag('br');
+        $this->content->text .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'courseid', 'value' => $COURSE->id));
+        $this->content->text .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'send', 'value' => get_string('save', 'block_downloadlicensepdf')));
         $this->content->text .= html_writer::end_tag('form');
         return $this->content;
     }
