@@ -23,7 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+/*
 $settings->add(new admin_setting_heading('sampleheader',
                                          get_string('headerconfig', 'block_downloadlicensepdf'),
                                          get_string('descconfig', 'block_downloadlicensepdf')));
@@ -32,3 +32,4 @@ $settings->add(new admin_setting_configcheckbox('downloadlicensepdf/foo',
                                                 get_string('labelfoo', 'block_downloadlicensepdf'),
                                                 get_string('descfoo', 'block_downloadlicensepdf'),
                                                 '0'));
+*/

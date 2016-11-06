@@ -31,61 +31,60 @@ class block_downloadlicensepdf extends block_base {
     }
 
     function get_content() {
-        global $CFG, $OUTPUT;
-
+        global $CFG, $OUTPUT, $COURSE;
         if ($this->content !== null) {
             return $this->content;
         }
-
-        if (empty($this->instance)) {
-            $this->content = '';
-            return $this->content;
+        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        if (!has_capability('moodle/course:manageactivities', $context)) {
+            return;
         }
-
-        $this->content = new stdClass();
-        $this->content->items = array();
-        $this->content->icons = array();
-        $this->content->footer = '';
-
-        // user/index.php expect course context, so get one if page has module context.
-        $currentcontext = $this->page->context->get_course_context(false);
-
-        if (! empty($this->config->text)) {
-            $this->content->text = $this->config->text;
+        $this->content = new stdClass;
+        $fs = get_file_storage();
+        $mod = get_fast_modinfo($COURSE);
+        $sections = $mod->get_sections();
+        $this->content->text = html_writer::start_tag('form',array('action' => '/path/file.php', 'method' => 'post'));
+        foreach ($sections as $sectionn => $cmids) {
+        	   foreach ($cmids as $cmid) {
+        	       $cminfo = $mod->get_cm($cmid);
+        	       $modn = $cminfo->modname;
+        	       $section = $mod->get_section_info($sectionn);
+        	       $secdir = sprintf("%02f", $sectionn) . ". " . clean_filename($section->name);
+        	       if ($cminfo->uservisible) {
+        	           $cm = $cminfo->get_course_module_record(true);
+        	           $files = $fs->get_area_files($cminfo->context->id,
+        	                                        'mod_'. $modn,
+        	                                        'content',
+        	                                        false,
+        	                                        'itemid, filepath, filename',
+        	                                        false);
+        	           $dir = $secdir;
+        	           if ($modn != 'resource') {
+        	               $dir .= '/' . clean_filename($cminfo->get_formatted_name());
+        	           }
+        	           foreach ($files as $pathha => $file) {
+        	               $filename = $file->get_filename();
+        	               if ($file->get_mimetype() == 'application/pdf' || substr(strrchr($filename, '.'),1) == 'pdf') {
+        	               	 $this->content->text .= html_writer::start_tag('input', array('type' => 'checkbox', 'name' => 'file_ids' , 'value' => $file->get_id()));
+        	                   $this->content->text .= $file->get_filename() . html_writer::end_tag('input');
+        	               }
+        	           }
+        	       }
+        	   }
         }
-
-        $this->content = '';
-        if (empty($currentcontext)) {
-            return $this->content;
-        }
-        if ($this->page->course->id == SITEID) {
-            $this->content->text .= "site context";
-        }
-
-        if (! empty($this->config->text)) {
-            $this->content->text .= $this->config->text;
-        }
-
+        //$this->content->text .= $file->get_filename() . html_writer::empty_tag('br');
+        $this->content->text .= html_writer::end_tag('form');
         return $this->content;
     }
-
+    
     // my moodle can only have SITEID and it's redundant here, so take it away
     public function applicable_formats() {
-        return array('all' => false,
-                     'site' => true,
-                     'site-index' => true,
-                     'course-view' => true, 
-                     'course-view-social' => false,
-                     'mod' => true, 
-                     'mod-quiz' => false);
+        return array('course-view' => true);
     }
-
     public function instance_allow_multiple() {
           return true;
     }
-
     function has_config() {return true;}
-
     public function cron() {
             mtrace( "Hey, my cron script is running" );
              
