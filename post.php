@@ -16,11 +16,12 @@
 require_once('./../../config.php');
 $courseid = required_param('courseid', PARAM_INT);
 require_login($courseid);
-$context = get_context_instance(CONTEXT_COURSE, $courseid);
+$context = context_course::instance($courseid);
 if (!has_capability('moodle/course:manageactivities', $context)) {
     die(get_string('notrainer', "block_downloadlicensepdf"));
 }
 global $DB, $CFG;
+$PAGE->set_url($CFG->wwwroot . '/blocks/downloadlicensepdf/post.php');
 require_once($CFG->dirroot . '/blocks/downloadlicensepdf/locallib.php');
 $fileids = $_POST["file_ids"]; // Get all checked Checkboxes.
 $allfileids = $_POST["all_ids"]; // Necessary to get all Checkbox elements to delete unwanted db entry's.

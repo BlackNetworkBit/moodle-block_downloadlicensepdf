@@ -34,7 +34,7 @@ class block_downloadlicensepdf extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
-        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        $context = context_course::instance($COURSE->id);
         if (!has_capability('moodle/course:manageactivities', $context)) {
             return;
         }
@@ -93,9 +93,6 @@ class block_downloadlicensepdf extends block_base {
     // my moodle can only have SITEID and it's redundant here, so take it away
     public function applicable_formats() {
         return array('course-view' => true);
-    }
-    public function instance_allow_multiple() {
-          return true;
     }
     function has_config() {return true;}
     public function cron() {
