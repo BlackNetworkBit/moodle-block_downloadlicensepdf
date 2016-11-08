@@ -26,10 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 class block_downloadlicensepdf extends block_base {
 
-    function init() {
+    public function init() {
         $this->title = get_string('pluginname', 'block_downloadlicensepdf');
     }
-    function get_content() {
+    public function get_content() {
         global $CFG, $OUTPUT, $COURSE;
         if ($this->content !== null) {
             return $this->content;
@@ -39,67 +39,78 @@ class block_downloadlicensepdf extends block_base {
             return;
         }
         require_once($CFG->dirroot . '/blocks/downloadlicensepdf/locallib.php');
-        $checkedfiles=block_downloadlicensepdf_get_records($COURSE->id);
+        $checkedfiles = block_downloadlicensepdf_get_records($COURSE->id);
         $this->content = new stdClass;
         $fs = get_file_storage();
         $mod = get_fast_modinfo($COURSE);
         $sections = $mod->get_sections();
-        $this->content->text = html_writer::start_tag('form',array('action' => '/blocks/downloadlicensepdf/post.php', 'method' => 'post'));
-        $this->content->text .= html_writer::start_tag('strong') . get_string('form_title', 'block_downloadlicensepdf') . html_writer::end_tag('strong');
+        $this->content->text = html_writer::start_tag('form', array(
+                               'action' => '/blocks/downloadlicensepdf/post.php',
+                               'method' => 'post'));
+        $this->content->text .= html_writer::start_tag('strong');
+        $this->content->text .= get_string('form_title', 'block_downloadlicensepdf');
+        $this->content->text .= html_writer::end_tag('strong');
         foreach ($sections as $sectionn => $cmids) {
-        	   foreach ($cmids as $cmid) {
-        	       $cminfo = $mod->get_cm($cmid);
-        	       $modn = $cminfo->modname;
-        	       $section = $mod->get_section_info($sectionn);
-        	       $secdir = sprintf("%02f", $sectionn) . ". " . clean_filename($section->name);
-        	       if ($cminfo->uservisible) {
-        	           $cm = $cminfo->get_course_module_record(true);
-        	           $files = $fs->get_area_files($cminfo->context->id,
-        	                                        'mod_'. $modn,
-        	                                        'content',
-        	                                        false,
-        	                                        'itemid, filepath, filename',
-        	                                        false);
-        	           $dir = $secdir;
-        	           if ($modn != 'resource') {
-        	               $dir .= '/' . clean_filename($cminfo->get_formatted_name());
-        	           }
-        	           foreach ($files as $pathha => $file) {
-        	               $rawfilename = $file->get_filename();
-        	               if ($file->get_mimetype() == 'application/pdf' || substr(strrchr($rawfilename, '.'),1) == 'pdf') {
-        	               	 $filename=substr($rawfilename, 0, strrpos($rawfilename,'.'));
-        	               	 $this->content->text .= html_writer::start_tag('div');
-        	               	 $this->content->text .= html_writer::start_tag('input',array('type' => 'hidden', 'name' => 'all_ids[]', 'value' => $file->get_id()));
-        	               	 $isselected=false;
-        	               	 foreach ($checkedfiles as $chk) {
-        	               	     if ($file->get_id() == $chk->file_id) {
-        	               	         $isselected=true;
-        	               	     }
-        	               	 }
-        	               	 $checkbox = '<input type="checkbox" name="file_ids[]" value="' . $file->get_id() . '" ' . ($isselected ? 'checked' : '') . '>';
-        	               	 $this->content->text .= $checkbox; // I note used empty_tag because they messed up with empty parameters ( checked not suported ).
-        	                   $this->content->text .= $filename . ' (PDF)' .  html_writer::end_tag('div');
-        	               }
-        	           }
-        	       }
-        	   }
+            foreach ($cmids as $cmid) {
+                $cminfo = $mod->get_cm($cmid);
+                $modn = $cminfo->modname;
+                $section = $mod->get_section_info($sectionn);
+                $secdir = sprintf("%02f", $sectionn) . ". " . clean_filename($section->name);
+                if ($cminfo->uservisible) {
+                    $cm = $cminfo->get_course_module_record(true);
+                    $files = $fs->get_area_files($cminfo->context->id,
+                                        'mod_'. $modn,
+                                        'content',
+                                        false,
+                                        'itemid, filepath, filename',
+                                        false);
+                    $dir = $secdir;
+                    if ($modn != 'resource') {
+                        $dir .= '/' . clean_filename($cminfo->get_formatted_name());
+                    }
+                    foreach ($files as $pathha => $file) {
+                        $rawfilename = $file->get_filename();
+                        if ($file->get_mimetype() == 'application/pdf' || substr(strrchr($rawfilename, '.'), 1) == 'pdf') {
+                            $filename = substr($rawfilename, 0, strrpos($rawfilename, '.'));
+                            $this->content->text .= html_writer::start_tag('div');
+                            $this->content->text .= html_writer::start_tag('input', array(
+                                                    'type' => 'hidden',
+                                                    'name' => 'all_ids[]',
+                                                    'value' => $file->get_id()));
+                            $isselected = false;
+                            foreach ($checkedfiles as $chk) {
+                                if ($file->get_id() == $chk->file_id) {
+                                    $isselected = true;
+                                }
+                            }
+                            $checkbox = '<input type="checkbox" name="file_ids[]" value="' . $file->get_id() . '" ';
+                            $checkbox .= ($isselected ? 'checked' : '') . '>'; // Not working with html_writer.
+                            $this->content->text .= $checkbox;
+                            $this->content->text .= $filename . ' (PDF)' .  html_writer::end_tag('div');
+                        }
+                    }
+                }
+            }
         }
-        $this->content->text .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'courseid', 'value' => $COURSE->id));
-        $this->content->text .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'send', 'value' => get_string('save', 'block_downloadlicensepdf')));
+        $this->content->text .= html_writer::empty_tag('input', array(
+                                'type' => 'hidden',
+                                'name' => 'courseid',
+                                'value' => $COURSE->id));
+        $this->content->text .= html_writer::empty_tag('input', array(
+                                'type' => 'submit',
+                                'name' => 'send',
+                                'value' => get_string('save', 'block_downloadlicensepdf')));
         $this->content->text .= html_writer::end_tag('form');
         return $this->content;
     }
-    
-    // my moodle can only have SITEID and it's redundant here, so take it away
     public function applicable_formats() {
         return array('course-view' => true);
     }
-    function has_config() {return true;}
+    public function has_config() {
+        return true;
+    }
     public function cron() {
-            mtrace( "Hey, my cron script is running" );
-             
-                 // do something
-                  
-                      return true;
+        mtrace( "Hey, my cron script is running" );
+        return true;
     }
 }

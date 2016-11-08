@@ -21,34 +21,33 @@
  * @copyright 2016 Vincent Schneider
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
- //id (AI)(int 20l), file_id (int 20l), course_id (int 20l))
+defined('MOODLE_INTERNAL') || die();
 function block_downloadlicensepdf_get_records($courseid) {
-    global $DB; 
+    global $DB;
     return $DB->get_records('block_downloadlicensepdf', array('course_id' => $courseid));
 }
-function block_downloadlicensepdf_delete_records($dataobjects,$courseid) {
-	global $DB; 
-	$querystring = 'DELETE from mdl_block_downloadlicensepdf where course_id=? and file_id in (' . implode(',', $dataobjects) . ')';
-	$DB->execute($querystring,array($courseid));
+function block_downloadlicensepdf_delete_records($dataobjects, $courseid) {
+    global $DB;
+    $querystring = 'DELETE from mdl_block_downloadlicensepdf where course_id=? and file_id in (' . implode(',', $dataobjects) . ')';
+    $DB->execute($querystring, array($courseid));
 }
-function block_downloadlicensepdf_add_records($dataobjects,$courseid) {
+function block_downloadlicensepdf_add_records($dataobjects, $courseid) {
     global $DB;
     $datae = block_downloadlicensepdf_get_records($courseid);
-    $insertdata=array();
-    foreach ($dataobjects as $data){
-    	  $skip=false;
-    	  foreach ($datae as $entry) {
-    	      if ($entry->file_id == $data) {
-    	          $skip=true;
-    	      }
-    	  }
-    	  if (!$skip) {
+    $insertdata = array();
+    foreach ($dataobjects as $data) {
+        $skip = false;
+        foreach ($datae as $entry) {
+            if ($entry->file_id == $data) {
+                $skip = true;
+            }
+        }
+        if (!$skip) {
             $newd = new stdClass();
             $newd->file_id = $data;
             $newd->course_id = $courseid;
-            $insertdata[]=$newd;
-    	  }
+            $insertdata[] = $newd;
+        }
     }
     return $DB->insert_records('block_downloadlicensepdf', $insertdata);
 }

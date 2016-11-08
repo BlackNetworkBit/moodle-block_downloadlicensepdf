@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,7 +29,6 @@ $string['headerconfig'] = 'Config section header';
 $string['labelfoo'] = 'Config label';
 $string['downloadlicensepdf:addinstance'] = 'Add a downloadlicensepdf block';
 $string['pluginname'] = 'Download License PDF';
-
 $string['save'] = 'Speichern';
 $string['form_title'] = 'Haben folgende PDF-Dateien Lizenzen?';
 $string['notrainer'] = 'Du bist kein Trainer !';

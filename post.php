@@ -26,24 +26,24 @@ require_once($CFG->dirroot . '/blocks/downloadlicensepdf/locallib.php');
 $fileids = $_POST["file_ids"]; // Get all checked Checkboxes.
 $allfileids = $_POST["all_ids"]; // Necessary to get all Checkbox elements to delete unwanted db entry's.
 if (is_array($allfileids)) {
-    $uncheckeditems=array();
-    $checkeditems=array();
+    $uncheckeditems = array();
+    $checkeditems = array();
     foreach ($fileids as $fileid) {
         $checkeditems[] = intval($fileid); // Load all Post data into an int array.
     }
     foreach ($allfileids as $afi) {
-    	  $afi = intval($afi);  // Convert the input to int to prevent further problems.
-    	  if (!in_array($afi, $checkeditems)){
-    	      $uncheckeditems[]=$afi; // All items which are not checked are unchecked.
-    	  }
+        $afi = intval($afi);  // Convert the input to int to prevent further problems.
+        if (!in_array($afi, $checkeditems)) {
+            $uncheckeditems[] = $afi; // All items which are not checked are unchecked.
+        }
     }
-    if (count($checkeditems)>0){
-        block_downloadlicensepdf_add_records($checkeditems,$courseid);
+    if (count($checkeditems) > 0) {
+        block_downloadlicensepdf_add_records($checkeditems, $courseid);
     }
-    if (count($uncheckeditems)>0){
-       block_downloadlicensepdf_delete_records($uncheckeditems,$courseid);
+    if (count($uncheckeditems) > 0) {
+        block_downloadlicensepdf_delete_records($uncheckeditems, $courseid);
     }
 }
-$uri=new moodle_url('/course/view.php', array('id' => $courseid));
+$uri = new moodle_url('/course/view.php', array('id' => $courseid));
 redirect($uri);
-// Db entry's are => id, file_id, course_id
+// Db entry's are => id, file_id, course_id.
