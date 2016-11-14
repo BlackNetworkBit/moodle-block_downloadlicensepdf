@@ -28,8 +28,9 @@ function block_downloadlicensepdf_get_records($courseid) {
 }
 function block_downloadlicensepdf_delete_records($dataobjects, $courseid) {
     global $DB;
-    $querystring = 'DELETE from mdl_block_downloadlicensepdf where course_id=? and file_id in (' . implode(',', $dataobjects) . ')';
-    $DB->execute($querystring, array($courseid));
+    list($sqlinstatement, $sqlinparams) = $DB->get_in_or_equal($dataobjects);
+    $sqlparams = array_merge(array($courseid), $sqlinparams);
+    $DB->delete_records_select('block_downloadlicensepdf', "course_id = ? AND file_id $sqlinparams", $sqlparams);
 }
 function block_downloadlicensepdf_add_records($dataobjects, $courseid) {
     global $DB;
